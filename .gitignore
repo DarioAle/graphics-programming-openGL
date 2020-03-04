@@ -50,3 +50,11 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# Metadata from eclipse
+.metadata/
+*.cproject
+*.xml
+*.prefs
+*.project
+RemoteSystemsTempFiles/
