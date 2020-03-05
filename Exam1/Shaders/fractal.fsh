@@ -5,9 +5,17 @@ out vec4 pixelColor;
 in vec3 vertexColorToFS;
 
 uniform ivec2 dimensions;
+uniform bool  isRGB;
 
 float delta = 2.4 / dimensions.x;
 float colorGray = 0.0;
+float inverseGray = 0.0;
+
+vec3 color1 = vec3(0.0, 0.0, 0.0);
+vec3 color2 = vec3(0.90, 0.98, 0.67);
+vec3 color3 = vec3(0.67, 0.17, 0.17);
+
+vec3 color_any;
 
 struct Complex
 {
@@ -38,7 +46,7 @@ Complex sumComplex(Complex c1, Complex c2)
 
 
 void main() {
-	Complex X = Complex(-1.2 + (gl_FragCoord.x * delta), -1.2 + (gl_FragCoord.y * delta));
+	Complex X = Complex(-1.2 + (gl_FragCoord.x * delta), 1.2 - (gl_FragCoord.y * delta));
 	Complex Z = Complex(-0.74543, 0.11301);
 
 	int count = 0;
@@ -51,14 +59,26 @@ void main() {
 	
 	if(lengthComplex(X) <= 2.0 ) {
 		colorGray = 0;
+		color_any = color1;
 	}
-	else {	
+	else {
 		colorGray = count / 128.0;
+		inverseGray = 1.0 - colorGray;
+	
+		color_any = vec3((colorGray * color3.r) + (inverseGray * color2.r),
+			 			 (colorGray * color3.g) + (inverseGray * color2.g),
+			 		     (colorGray * color3.b) + (inverseGray * color2.b)); 
+		
 	}
 	
-
-	pixelColor = vec4(colorGray, colorGray, colorGray, 1.0);
-	
+	if(!isRGB)
+	{
+		pixelColor = vec4(colorGray, colorGray, colorGray, 1.0);
+	}
+	else 
+	{
+		pixelColor = vec4(color_any, 1.0);
+	}
 	
 	
 	

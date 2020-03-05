@@ -10,8 +10,15 @@
 #include "Transforms/Transforms.h"
 #include <stdio.h>
 
-static GLuint vertexColLoc, vertexPositionLoc, dimensions, programId;
-static GLint global_dimensions[2] = {};
+static GLuint vertexColLoc, vertexPositionLoc, dimensions, programId, isRgb;
+static void display();
+int globaIsRGB = GL_FALSE;
+
+void pressEnter(unsigned char key, int x, int y)
+{
+	globaIsRGB ^= 1;
+	display();
+}
 
 static void initShaders() {
 	GLuint vShaderId = compileShader("shaders/vertexPosition.vsh", GL_VERTEX_SHADER);
@@ -26,8 +33,10 @@ static void initShaders() {
 	glLinkProgram(programId);
 
 	vertexPositionLoc = glGetAttribLocation (programId, "vertexPosition");	// Vertex Shader
-	vertexColLoc      = glGetAttribLocation (programId, "vertexColor");
+	vertexColLoc      = glGetAttribLocation (programId, "vertexColor");		// Vertex shader
 	dimensions        = glGetUniformLocation(programId, "dimensions");		// Vertex Shader
+
+	isRgb             = glGetUniformLocation(programId, "isRGB");			// Fragment shader
 
 }
 
@@ -57,19 +66,15 @@ static void init() {
 static void display() {
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	global_dimensions[0] = glutGet(GLUT_WINDOW_WIDTH);
-	global_dimensions[1] = glutGet(GLUT_WINDOW_HEIGHT);
-
 	glUseProgram(programId);
-	glUniform2i(dimensions, global_dimensions[0], global_dimensions[1]);
+	glUniform2i(dimensions, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
+
+	glUniform1i(isRgb, globaIsRGB);
+
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glutSwapBuffers();
 }
 
-static void timerFunc(int id) {
-	glutPostRedisplay();
-	glutTimerFunc(10, timerFunc, 1);
-}
 
 int main(int argc, char** argv) {
 	setbuf(stdout, NULL);
@@ -79,14 +84,14 @@ int main(int argc, char** argv) {
 	int x = (glutGet(GLUT_SCREEN_WIDTH) - w) / 2;
 	int y = (glutGet(GLUT_SCREEN_HEIGHT) - h) / 2;
 
-
 	glutInitWindowSize(w, h);
 	glutInitWindowPosition(x, y);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
+
 	glutCreateWindow("Exam 1.1: Julia´s Set");
 	glutDisplayFunc(display);
-//	glutTimerFunc(10, timerFunc, 1);
 	glewInit();
+	glutKeyboardFunc(pressEnter);
 	glClearColor(0.95, 0.95, 1.0, 1.0);
 
 	initShaders();
