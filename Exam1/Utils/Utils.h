@@ -12,8 +12,8 @@
 
 typedef enum { false, true } bool;
 
-const char* loadShader(const char* filename);
-GLuint compileShader(const char* filename, GLuint shaderType);
+const char* loadShader(const char* filename, int);
+GLuint compileShader(const char* filename, GLuint shaderType, int);
 bool shaderCompiled(GLuint shaderId);
 bool loadBMP(const char* filename, unsigned char **pdata, unsigned int *width, unsigned int *height);
 

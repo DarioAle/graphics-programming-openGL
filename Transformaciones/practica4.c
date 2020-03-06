@@ -61,7 +61,6 @@ static void initShaders() {
 	vertexPosLoc   = glGetAttribLocation(programId, "vertexPosition");
 	vertexColLoc   = glGetAttribLocation(programId, "vertexColor");
 
-
 }
 
 void display()
@@ -101,7 +100,7 @@ void initVertex()
 	glPrimitiveRestartIndex(0xFFFF);
 }
 
-int main(int argc, char** argv)
+int main_practica4(int argc, char** argv)
 {
 	setbuf(stdout, NULL);
 	glutInit(&argc, argv);

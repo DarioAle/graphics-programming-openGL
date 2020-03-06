@@ -21,10 +21,10 @@ void pressEnter(unsigned char key, int x, int y)
 }
 
 static void initShaders() {
-	GLuint vShaderId = compileShader("shaders/vertexPosition.vsh", GL_VERTEX_SHADER);
+	GLuint vShaderId = compileShader("shaders/vertexPosition.vsh", GL_VERTEX_SHADER, GL_FALSE);
 	if(!shaderCompiled(vShaderId)) return;
 
-	GLuint fShaderId = compileShader("shaders/fractal.fsh", GL_FRAGMENT_SHADER);
+	GLuint fShaderId = compileShader("shaders/fractal.fsh", GL_FRAGMENT_SHADER, GL_TRUE);
 	if(!shaderCompiled(fShaderId)) return;
 
 	programId = glCreateProgram();
@@ -76,7 +76,7 @@ static void display() {
 }
 
 
-int main(int argc, char** argv) {
+int main_1_1(int argc, char** argv) {
 	setbuf(stdout, NULL);
 
 	glutInit(&argc, argv);

@@ -57,10 +57,15 @@ static void createSquare() {
 			              -2, -1,  3,
 			              -2,  1,  3,
 
-						 -2, -1, -3,
-						  2, -1, -3,
-						 -2,  2, -3,
-						  2,  2, -3
+						  -2, -1, -3,
+						   2, -1, -3,
+						  -2,  2, -3,
+						   2,  2, -3,
+
+						   2, -1,  3,
+						   2, -1, -3,
+						  -2, -1,  3,
+						  -2, -1, -3
 
 	};
 
@@ -87,7 +92,12 @@ static void createSquare() {
 						   0,  1,  1,
 						   0,  1,  1,
 						   0,  1,  1,
-						   0,  1,  1
+						   0,  1,  1,
+
+						   1,  1,  0,
+						   1,  1,  0,
+						   1,  1,  0,
+						   1,  1,  0
 
 	};
 
@@ -95,7 +105,8 @@ static void createSquare() {
 			                    4,  5,  6,  7, 0xFFFF,
 			                    8,  9, 10, 11, 0xFFFF,
 			                   12, 13, 14, 15, 0xFFFF,
-							   16, 17, 18, 19
+							   16, 17, 18, 19, 0xFFFF,
+							   20, 21, 22, 23
 	};
 
 	glGenVertexArrays(1, va);
@@ -133,7 +144,7 @@ static void display() {
 	rotateX(&csMat, yaw);
 	rotateZ(&csMat, roll);
 	glUniformMatrix4fv(csMatrixLoc, 1, GL_TRUE, csMat.values);
-	glDrawElements(GL_TRIANGLE_STRIP, 24, GL_UNSIGNED_SHORT, 0);
+	glDrawElements(GL_TRIANGLE_STRIP, 29, GL_UNSIGNED_SHORT, 0);
 	glutSwapBuffers();
 }
 
@@ -149,7 +160,7 @@ static void timerFunc(int id) {
 	glutPostRedisplay();
 }
 
-int main1(int argc, char **argv) {
+int main(int argc, char **argv) {
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE);
     glutInitWindowSize(600, 600);

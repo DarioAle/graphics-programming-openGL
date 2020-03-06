@@ -12,7 +12,7 @@
 #include <GL/glew.h>
 
 
-const char* loadShader(const char* filename) {
+const char* loadShader(const char* filename, int booleanVerbose) {
 	FILE* shaderFile = fopen(filename, "r");
 	const int BUFFER_SIZE = 256;
 	char buffer[BUFFER_SIZE];
@@ -38,13 +38,15 @@ const char* loadShader(const char* filename) {
 	shaderData[charIndex] = '\0';
 
 	fclose(shaderFile);
-	printf("%s\n", shaderData);
+
+	if(booleanVerbose)
+		printf("%s\n", shaderData);
 	return shaderData;
 }
 
-GLuint compileShader(const char* filename, GLuint shaderType) {
+GLuint compileShader(const char* filename, GLuint shaderType, int booleanVerbose) {
 //	char const* source = "void main() { ... ";
-	char const* source = loadShader(filename);
+	char const* source = loadShader(filename, booleanVerbose);
 	GLuint shaderId = glCreateShader(shaderType);
 	glShaderSource(shaderId, 1, &source, NULL);
 	glCompileShader(shaderId);
