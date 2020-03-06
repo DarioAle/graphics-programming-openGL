@@ -11,10 +11,10 @@
 #include <stdio.h>
 
 #define ROWS    5
-#define COLUMNS 5
+#define COLUMNS 10
 
-#define ROW_WIDTH (1.96 / ROWS)
-#define COLUMN_WIDTH (1.96 / COLUMNS)
+#define ROW_WIDTH (2.0 / ROWS)
+#define COLUMN_WIDTH (2.0 / COLUMNS)
 
 GLushort meshIndex[ ((2 * (COLUMNS + 1)) * ROWS) + ROWS - 1] = {};
 static float meshPos[((2 * (COLUMNS + 1)) * ROWS) * 2] = {};
@@ -26,12 +26,16 @@ static GLuint bufferId[3] = {};
 
 static void display();
 static void initShaders();
+static void createMesh();
+static void init();
 
 GLuint primitive = GL_TRIANGLE_STRIP;
 
 static void pressEnter(unsigned char key, int x, int y)
 {
-	primitive = primitive == GL_TRIANGLE_STRIP ? GL_LINE_STRIP : GL_TRIANGLE_STRIP;
+//	primitive = primitive == GL_TRIANGLE_STRIP ? GL_LINE_STRIP : GL_TRIANGLE_STRIP;
+	createMesh();
+	init();
 	display();
 }
 
@@ -62,14 +66,14 @@ static void createMesh()
 {
 //	printf("size of mesh: %d", sizeof(meshPos));
 
-	float startPointy = 0.98 - ROW_WIDTH;
+	float startPointy = 1.0 - ROW_WIDTH;
 	int columnIndex = 0;
 	int bufferIndex = 0;
 	int colorIndex = 0;
 
 	for(int i = 0; i < ROWS; i++)
 	{
-		float startPointx = -0.98;
+		float startPointx = -1.0;
 		for(int j = 0; j < COLUMNS + 1; j++)
 		{
 			meshPos[(columnIndex * 4)] = startPointx;
@@ -78,7 +82,7 @@ static void createMesh()
 			meshPos[(columnIndex * 4) + 2] = startPointx;
 			meshPos[(columnIndex * 4) + 3] = startPointy + ROW_WIDTH;
 
-			printf("(%f, %f) , (%f, %f)\n", meshPos[j *4], meshPos[(j *4) + 1], meshPos[(j *4) + 2], meshPos[(j *4) + 3]);
+//			printf("(%f, %f) , (%f, %f)\n", meshPos[j *4], meshPos[(j *4) + 1], meshPos[(j *4) + 2], meshPos[(j *4) + 3]);
 			startPointx += COLUMN_WIDTH;
 			columnIndex++;
 		}
