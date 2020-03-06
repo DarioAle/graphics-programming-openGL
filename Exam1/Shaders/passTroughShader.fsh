@@ -5,6 +5,6 @@ out vec4 pixelColor;
 in vec3 vertexColorToFS;
 
 void main() {
-	pixelColor = vec4(0.0,0.0,0.0, 1.0);
+	pixelColor = vec4(vertexColorToFS, 1.0);
 	
 }

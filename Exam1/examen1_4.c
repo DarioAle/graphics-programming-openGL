@@ -10,18 +10,15 @@
 #include "Transforms/Transforms.h"
 #include <stdio.h>
 
-#define ROWS    20
-#define COLUMNS 20
+#define ROWS    5
+#define COLUMNS 5
 
 #define ROW_WIDTH (1.96 / ROWS)
 #define COLUMN_WIDTH (1.96 / COLUMNS)
 
-#define START
 GLushort meshIndex[ ((2 * (COLUMNS + 1)) * ROWS) + ROWS - 1] = {};
 static float meshPos[((2 * (COLUMNS + 1)) * ROWS) * 2] = {};
-
-
-//static float meshColor[((2 * (COLUMNS + 1)) + (ROWS)) * 3] = {};
+static float meshColor[((2 * (COLUMNS + 1)) * ROWS) * 3] = {};
 
 static GLuint vertexColLoc, vertexPositionLoc,programId;
 static GLuint va[1] = {};
@@ -30,31 +27,28 @@ static GLuint bufferId[3] = {};
 static void display();
 static void initShaders();
 
-
+GLuint primitive = GL_TRIANGLE_STRIP;
 
 static void pressEnter(unsigned char key, int x, int y)
 {
-
+	primitive = primitive == GL_TRIANGLE_STRIP ? GL_LINE_STRIP : GL_TRIANGLE_STRIP;
 	display();
 }
 
 static void init() {
-
-
 	glGenVertexArrays(1, va);
 	glBindVertexArray(va[0]);
 	glGenBuffers(3, bufferId);
-
 
 	glBindBuffer(GL_ARRAY_BUFFER, bufferId[0]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(meshPos), meshPos, GL_STATIC_DRAW);
 	glVertexAttribPointer(vertexPositionLoc, 2, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(vertexPositionLoc);
 
-//	glBindBuffer(GL_ARRAY_BUFFER, bufferId2);
-//	glBufferData(GL_ARRAY_BUFFER, sizeof(color), color, GL_STATIC_DRAW);
-//	glVertexAttribPointer(vertexColLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
-//	glEnableVertexAttribArray(vertexColLoc);
+	glBindBuffer(GL_ARRAY_BUFFER, bufferId[1]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(meshColor), meshColor, GL_STATIC_DRAW);
+	glVertexAttribPointer(vertexColLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray(vertexColLoc);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferId[2]);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(meshIndex), meshIndex, GL_STATIC_DRAW);
@@ -71,6 +65,7 @@ static void createMesh()
 	float startPointy = 0.98 - ROW_WIDTH;
 	int columnIndex = 0;
 	int bufferIndex = 0;
+	int colorIndex = 0;
 
 	for(int i = 0; i < ROWS; i++)
 	{
@@ -83,11 +78,11 @@ static void createMesh()
 			meshPos[(columnIndex * 4) + 2] = startPointx;
 			meshPos[(columnIndex * 4) + 3] = startPointy + ROW_WIDTH;
 
-//			printf("(%f, %f) , (%f, %f)\n", meshPos[j *4], meshPos[(j *4) + 1], meshPos[(j *4) + 2], meshPos[(j *4) + 3]);
-
+			printf("(%f, %f) , (%f, %f)\n", meshPos[j *4], meshPos[(j *4) + 1], meshPos[(j *4) + 2], meshPos[(j *4) + 3]);
 			startPointx += COLUMN_WIDTH;
 			columnIndex++;
 		}
+		printf("\n");
 
 		for(int a = 0; a < (COLUMNS + 1) * 2; a++, bufferIndex++)
 		{
@@ -95,37 +90,63 @@ static void createMesh()
 		}
 		meshIndex[bufferIndex + i] = 0xFFFF;
 
-		printf("\n");
-		startPointy -= ROW_WIDTH;
 
+
+		startPointy -= ROW_WIDTH;
  	}
 
-	for(int i = 0; i < 37; i++)
+	float tempColor  [((COLUMNS + 1) * (ROWS + 1)) * 3] = {};
+	for(int k = 0; k < (COLUMNS + 1) * (ROWS + 1) * 3; k++, colorIndex++)
 	{
-//		printf("%d\n", meshIndex[i]);
+		tempColor[k] = rand()/(RAND_MAX*1.0);
 	}
+
+	int increment = 0;
+	for(int last = 0; last < (((COLUMNS + 1)) * (ROWS)) ; last++)
+	{
+		int mirror = ((2 * (COLUMNS + 1)) + 1+ increment);
+
+		meshColor[(increment) * 3] =
+		meshColor[ mirror * 3] =
+				tempColor[(last * 3)];
+
+		meshColor[((increment) * 3) + 1] =
+		meshColor[ (mirror * 3) + 1] =
+				tempColor[(last * 3) + 1];
+
+		meshColor[((increment) * 3) + 2] =
+		meshColor[ (mirror * 3) + 2] =
+				tempColor[(last * 3) + 2];
+		increment += 2;
+	}
+
+	// fillin uper peaks
+	for(int desperate = 1; desperate < (COLUMNS + 1) * 2;desperate += 2){
+		meshColor[(desperate * 3)] = rand()/(RAND_MAX*1.0);
+		meshColor[(desperate * 3) + 1] = rand()/(RAND_MAX*1.0);
+		meshColor[(desperate * 3) + 2] = rand()/(RAND_MAX*1.0);
+	}
+
 }
 
 
 
 static void display() {
 	glClear(GL_COLOR_BUFFER_BIT);
-
 	glUseProgram(programId);
-
 	glPointSize(5.0);
-
+	glLineWidth(5.0);
 	glBindVertexArray(va[0]);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferId[2]);
-	glDrawElements(GL_LINE_STRIP,(((2 * (COLUMNS + 1)) * ROWS) + ROWS - 1), GL_UNSIGNED_SHORT, 0);
-
-
+	glDrawElements(primitive,(((2 * (COLUMNS + 1)) * ROWS) + ROWS - 1), GL_UNSIGNED_SHORT, 0);
 	glutSwapBuffers();
 }
 
 
 int main(int argc, char** argv) {
 	setbuf(stdout, NULL);
+
+	srand(time(0));
 
 	glutInit(&argc, argv);
 	int w = 600, h = 600;
