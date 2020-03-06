@@ -9,27 +9,32 @@
 #include "Utils/Utils.h"
 #include "Transforms/Transforms.h"
 #include <stdio.h>
+#include <time.h>
 
-#define ROWS    5
-#define COLUMNS 10
+// Input parameters
+#define ROWS    8
+#define COLUMNS 8
 
-#define ROW_WIDTH (2.0 / ROWS)
-#define COLUMN_WIDTH (2.0 / COLUMNS)
+#define ROW_WIDTH (2.0 / ROWS)       // Whole normalized squared is two units wide
+#define COLUMN_WIDTH (2.0 / COLUMNS) // Whole normalized squared is two units high
 
-GLushort meshIndex[ ((2 * (COLUMNS + 1)) * ROWS) + ROWS - 1] = {};
-static float meshPos[((2 * (COLUMNS + 1)) * ROWS) * 2] = {};
-static float meshColor[((2 * (COLUMNS + 1)) * ROWS) * 3] = {};
+// Initialize three buffers
+GLushort meshIndex    [((2 * (COLUMNS + 1)) * ROWS) + ROWS - 1] = {};
+static float meshPos  [((2 * (COLUMNS + 1)) * ROWS) * 2]        = {};
+static float meshColor[((2 * (COLUMNS + 1)) * ROWS) * 3]        = {};
 
+// buffer id and attributes location
 static GLuint vertexColLoc, vertexPositionLoc,programId;
 static GLuint va[1] = {};
 static GLuint bufferId[3] = {};
 
+// Function definitions
 static void display();
 static void initShaders();
 static void createMesh();
 static void init();
 
-GLuint primitive = GL_TRIANGLE_STRIP;
+GLuint primitive = GL_LINE_STRIP;
 
 static void pressEnter(unsigned char key, int x, int y)
 {
@@ -40,23 +45,28 @@ static void pressEnter(unsigned char key, int x, int y)
 }
 
 static void init() {
+	// Bind vertex array
 	glGenVertexArrays(1, va);
 	glBindVertexArray(va[0]);
 	glGenBuffers(3, bufferId);
 
+	// Bind position buffer
 	glBindBuffer(GL_ARRAY_BUFFER, bufferId[0]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(meshPos), meshPos, GL_STATIC_DRAW);
 	glVertexAttribPointer(vertexPositionLoc, 2, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(vertexPositionLoc);
 
+	// Bind color buffer
 	glBindBuffer(GL_ARRAY_BUFFER, bufferId[1]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(meshColor), meshColor, GL_STATIC_DRAW);
 	glVertexAttribPointer(vertexColLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(vertexColLoc);
 
+	// Bind index buffer
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferId[2]);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(meshIndex), meshIndex, GL_STATIC_DRAW);
 
+	// Allow restarts
 	glEnable(GL_PRIMITIVE_RESTART);
 	glPrimitiveRestartIndex(0xFFFF);
 
@@ -64,40 +74,33 @@ static void init() {
 
 static void createMesh()
 {
-//	printf("size of mesh: %d", sizeof(meshPos));
-
 	float startPointy = 1.0 - ROW_WIDTH;
 	int columnIndex = 0;
 	int bufferIndex = 0;
 	int colorIndex = 0;
 
-	for(int i = 0; i < ROWS; i++)
+	for(int i = 0; i < ROWS; i++, startPointy -= ROW_WIDTH)
 	{
 		float startPointx = -1.0;
-		for(int j = 0; j < COLUMNS + 1; j++)
+		// Calculate the positions of the mesh points
+		for(int j = 0; j < COLUMNS + 1; j++, columnIndex++, startPointx += COLUMN_WIDTH)
 		{
+			// Add two points at a time, to create a vertical line
 			meshPos[(columnIndex * 4)] = startPointx;
 			meshPos[(columnIndex * 4) + 1] = startPointy;
 
 			meshPos[(columnIndex * 4) + 2] = startPointx;
 			meshPos[(columnIndex * 4) + 3] = startPointy + ROW_WIDTH;
-
-//			printf("(%f, %f) , (%f, %f)\n", meshPos[j *4], meshPos[(j *4) + 1], meshPos[(j *4) + 2], meshPos[(j *4) + 3]);
-			startPointx += COLUMN_WIDTH;
-			columnIndex++;
 		}
-		printf("\n");
 
+		// Calculate the values for the indexes
 		for(int a = 0; a < (COLUMNS + 1) * 2; a++, bufferIndex++)
 		{
 			meshIndex[bufferIndex + i] = bufferIndex;
 		}
-		meshIndex[bufferIndex + i] = 0xFFFF;
-
-
-
-		startPointy -= ROW_WIDTH;
+		meshIndex[bufferIndex + i] = 0xFFFF;	// Add restart value to the indexes
  	}
+
 
 	float tempColor  [((COLUMNS + 1) * (ROWS + 1)) * 3] = {};
 	for(int k = 0; k < (COLUMNS + 1) * (ROWS + 1) * 3; k++, colorIndex++)
@@ -124,7 +127,7 @@ static void createMesh()
 		increment += 2;
 	}
 
-	// fillin uper peaks
+	// fillin upper peaks
 	for(int desperate = 1; desperate < (COLUMNS + 1) * 2;desperate += 2){
 		meshColor[(desperate * 3)] = rand()/(RAND_MAX*1.0);
 		meshColor[(desperate * 3) + 1] = rand()/(RAND_MAX*1.0);
@@ -132,8 +135,6 @@ static void createMesh()
 	}
 
 }
-
-
 
 static void display() {
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -145,7 +146,6 @@ static void display() {
 	glDrawElements(primitive,(((2 * (COLUMNS + 1)) * ROWS) + ROWS - 1), GL_UNSIGNED_SHORT, 0);
 	glutSwapBuffers();
 }
-
 
 int main(int argc, char** argv) {
 	setbuf(stdout, NULL);
@@ -162,7 +162,7 @@ int main(int argc, char** argv) {
 	glutInitWindowPosition(x, y);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
 
-	glutCreateWindow("Exam 1.1: Julia´s Set");
+	glutCreateWindow("Exam 1.4: Color mesh");
 	glutDisplayFunc(display);
 	glewInit();
 	glutKeyboardFunc(pressEnter);

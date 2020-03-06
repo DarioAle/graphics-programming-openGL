@@ -43,7 +43,6 @@ void exitFunc(unsigned char key, int mouseX , int mouseY)
 {
 	if (key == 27)
 	{
-//	   glDeleteVertexArrays(1, va);
 	   exit(0);
 	}
 }
