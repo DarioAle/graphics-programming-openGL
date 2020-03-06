@@ -12,8 +12,8 @@
 #include <time.h>
 
 // Input parameters
-#define ROWS    8
-#define COLUMNS 8
+#define ROWS    2
+#define COLUMNS 3
 
 #define ROW_WIDTH (2.0 / ROWS)       // Whole normalized squared is two units wide
 #define COLUMN_WIDTH (2.0 / COLUMNS) // Whole normalized squared is two units high
@@ -34,7 +34,7 @@ static void initShaders();
 static void createMesh();
 static void init();
 
-GLuint primitive = GL_LINE_STRIP;
+GLuint primitive = GL_TRIANGLE_STRIP;
 
 static void pressEnter(unsigned char key, int x, int y)
 {
@@ -74,14 +74,16 @@ static void init() {
 
 static void createMesh()
 {
-	float startPointy = 1.0 - ROW_WIDTH;
+	// One index for each buffer
 	int columnIndex = 0;
 	int bufferIndex = 0;
 	int colorIndex = 0;
 
+	float startPointy = 1.0 - ROW_WIDTH;
 	for(int i = 0; i < ROWS; i++, startPointy -= ROW_WIDTH)
 	{
 		float startPointx = -1.0;
+
 		// Calculate the positions of the mesh points
 		for(int j = 0; j < COLUMNS + 1; j++, columnIndex++, startPointx += COLUMN_WIDTH)
 		{
@@ -99,39 +101,30 @@ static void createMesh()
 			meshIndex[bufferIndex + i] = bufferIndex;
 		}
 		meshIndex[bufferIndex + i] = 0xFFFF;	// Add restart value to the indexes
+
+		// Produce random colors for each of the vertexes
+		// Notice how each color is assigned to two vertex
+		// That are located at the same place to produce only one color
+		for(int k = 0; k < COLUMNS + 1; k++, colorIndex += 2)
+		{
+			int mirror = ((2 * (COLUMNS + 1)) + 1 + colorIndex);
+
+			meshColor[colorIndex * 3]       =
+			meshColor[ mirror * 3]          = rand()/(RAND_MAX*1.0);
+
+			meshColor[(colorIndex * 3) + 1] =
+			meshColor[(mirror * 3) + 1]     = rand()/(RAND_MAX*1.0);
+
+			meshColor[(colorIndex * 3) + 2] =
+			meshColor[(mirror * 3) + 2]     = rand()/(RAND_MAX*1.0);
+		}
  	}
 
-
-	float tempColor  [((COLUMNS + 1) * (ROWS + 1)) * 3] = {};
-	for(int k = 0; k < (COLUMNS + 1) * (ROWS + 1) * 3; k++, colorIndex++)
-	{
-		tempColor[k] = rand()/(RAND_MAX*1.0);
-	}
-
-	int increment = 0;
-	for(int last = 0; last < (((COLUMNS + 1)) * (ROWS)) ; last++)
-	{
-		int mirror = ((2 * (COLUMNS + 1)) + 1+ increment);
-
-		meshColor[(increment) * 3] =
-		meshColor[ mirror * 3] =
-				tempColor[(last * 3)];
-
-		meshColor[((increment) * 3) + 1] =
-		meshColor[ (mirror * 3) + 1] =
-				tempColor[(last * 3) + 1];
-
-		meshColor[((increment) * 3) + 2] =
-		meshColor[ (mirror * 3) + 2] =
-				tempColor[(last * 3) + 2];
-		increment += 2;
-	}
-
-	// fillin upper peaks
-	for(int desperate = 1; desperate < (COLUMNS + 1) * 2;desperate += 2){
-		meshColor[(desperate * 3)] = rand()/(RAND_MAX*1.0);
-		meshColor[(desperate * 3) + 1] = rand()/(RAND_MAX*1.0);
-		meshColor[(desperate * 3) + 2] = rand()/(RAND_MAX*1.0);
+	// Assigning upper-most peaks with a color
+	for(int f = 1; f < (COLUMNS + 1) * 2; f += 2){
+		meshColor[(f * 3)]     = rand()/(RAND_MAX*1.0);
+		meshColor[(f * 3) + 1] = rand()/(RAND_MAX*1.0);
+		meshColor[(f * 3) + 2] = rand()/(RAND_MAX*1.0);
 	}
 
 }
