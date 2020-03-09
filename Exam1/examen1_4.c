@@ -36,9 +36,10 @@ static void init();
 
 GLuint primitive = GL_TRIANGLE_STRIP;
 
+// When you press enter it produces a different random terrain with the 3rd dimension being the
+// color assigned to the area by the rasterizer
 static void pressEnter(unsigned char key, int x, int y)
 {
-//	primitive = primitive == GL_TRIANGLE_STRIP ? GL_LINE_STRIP : GL_TRIANGLE_STRIP;
 	createMesh();
 	init();
 	display();
