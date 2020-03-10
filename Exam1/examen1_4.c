@@ -15,8 +15,8 @@
 #define ROWS    8
 #define COLUMNS 8
 
-#define ROW_WIDTH (2.0 / ROWS)       // Whole normalized squared is two units wide
-#define COLUMN_WIDTH (2.0 / COLUMNS) // Whole normalized squared is two units high
+#define ROW_WIDTH (2.0 / ROWS)       // Whole normalized square is two units wide
+#define COLUMN_WIDTH (2.0 / COLUMNS) // Whole normalized square is two units high
 
 // Initialize three buffers
 GLushort meshIndex    [((2 * (COLUMNS + 1)) * ROWS) + ROWS - 1] = {};
@@ -36,9 +36,10 @@ static void init();
 
 GLuint primitive = GL_TRIANGLE_STRIP;
 
+// When you press enter it produces a different random terrain with the 3rd dimension being the
+// color assigned to the area by the rasterizer
 static void pressEnter(unsigned char key, int x, int y)
 {
-//	primitive = primitive == GL_TRIANGLE_STRIP ? GL_LINE_STRIP : GL_TRIANGLE_STRIP;
 	createMesh();
 	init();
 	display();
