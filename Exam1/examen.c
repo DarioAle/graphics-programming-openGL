@@ -12,7 +12,7 @@
 
 static GLuint vertexColLoc, vertexPositionLoc, dimensions, programId, isRgb;
 static void display();
-int globaIsRGB = GL_FALSE;
+int globaIsRGB = GL_TRUE;
 
 void pressEnter(unsigned char key, int x, int y)
 {

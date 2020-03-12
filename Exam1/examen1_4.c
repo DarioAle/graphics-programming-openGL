@@ -12,8 +12,8 @@
 #include <time.h>
 
 // Input parameters
-#define ROWS    8
-#define COLUMNS 8
+#define ROWS    10
+#define COLUMNS 5
 
 #define ROW_WIDTH (2.0 / ROWS)       // Whole normalized square is two units wide
 #define COLUMN_WIDTH (2.0 / COLUMNS) // Whole normalized square is two units high

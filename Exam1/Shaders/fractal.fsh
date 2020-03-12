@@ -1,6 +1,5 @@
 #version 330
 
-
 out vec4 pixelColor; 
 in vec3 vertexColorToFS;
 
@@ -12,8 +11,8 @@ float colorGray = 0.0;
 float inverseGray = 0.0;
 
 vec3 color1 = vec3(0.0, 0.0, 0.0);
-vec3 color2 = vec3(0.90, 0.98, 0.67);
-vec3 color3 = vec3(0.67, 0.17, 0.17);
+vec3 color2 = vec3(0.33, 0.83, 0.83);
+vec3 color3 = vec3(0.10, 0.02, 0.33);
 
 vec3 color_any;
 
@@ -51,8 +50,7 @@ void main() {
 
 	int count = 0;
 	
-	while(lengthComplex(X) <= 2.0 && count < 128.0)
-	{
+	while(lengthComplex(X) <= 2.0 && count < 128.0) {
 		X = sumComplex(squareComplex(X), Z);
 		count++;
 	}
@@ -65,21 +63,14 @@ void main() {
 		colorGray = count / 128.0;
 		inverseGray = 1.0 - colorGray;
 	
-		color_any = vec3((colorGray * color3.r) + (inverseGray * color2.r),
-			 			 (colorGray * color3.g) + (inverseGray * color2.g),
-			 		     (colorGray * color3.b) + (inverseGray * color2.b)); 
-		
+		color_any = vec3((colorGray * color2) + (inverseGray * color3));   	
 	}
 	
-	if(!isRGB)
-	{
+	if(!isRGB) {
 		pixelColor = vec4(colorGray, colorGray, colorGray, 1.0);
 	}
-	else 
-	{
+	else {
 		pixelColor = vec4(color_any, 1.0);
 	}
-	
-	
 	
 }
