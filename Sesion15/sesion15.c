@@ -16,15 +16,15 @@
 #define DEGREES_2_RADIANS(x) (M_PI * x / 180)
 
 // Input parameters
-#define ROWS    10
-#define COLUMNS 5
+#define ROWS    2
+#define COLUMNS 10
 
-#define ROW_WIDTH (2.0 / ROWS)       // Whole normalized square is two units wide
-#define COLUMN_WIDTH (2.0 / COLUMNS) // Whole normalized square is two units high
+#define ROW_WIDTH    1.0       // Whole normalized square is two units wide
+#define COLUMN_WIDTH 1.0 // Whole normalized square is two units high
 
 // Initialize three buffers
 static GLushort meshIndex [((2 * (COLUMNS + 1)) * ROWS) + ROWS - 1] = {};
-static float meshPos      [((2 * (COLUMNS + 1)) * ROWS) * 2]        = {};
+static float meshPos      [((2 * (COLUMNS + 1)) * ROWS) * 3]        = {};
 static float meshColor    [((2 * (COLUMNS + 1)) * ROWS) * 3]        = {};
 
 static GLuint vertexMeshColLoc, vertexMeshPositionLoc;
@@ -93,10 +93,7 @@ static void createRoom(int w, int h, int d) {
 	float y1 = -h/2, y2 = h/2;
 	float z1 = -d/2, z2 = d/2;
 	float roomPos[] = { // Front (far) wall
-						 x1, y1, z1,
-						 x1, y2, z1,
-						 x2, y1, z1,
-						 x2, y2, z1,
+
 						 // Back (near) wall
 						 x2, y1, z2,
 						 x2, y2, z2,
@@ -120,10 +117,7 @@ static void createRoom(int w, int h, int d) {
 						// Ceiling
 
 	};
-	float roomCol[] = {     0,  1,  0,
-							0,  1,  0,
-						    0,  1,  0,
-							0,  1,  0,
+	float roomCol[] = {
 
 							1,  0,  0,
 							1,  0,  0,
@@ -150,8 +144,8 @@ static void createRoom(int w, int h, int d) {
 	GLushort roomIndex[] = {  0,  1,  2,  3, 0xFFFF,
 				              4,  5,  6,  7, 0xFFFF,
 				              8,  9, 10, 11, 0xFFFF,
-				             12, 13, 14, 15, 0xFFFF,
-							 16, 17, 18, 19, 0xFFFF,
+				             12, 13, 14, 15, 0xFFFF
+
 
 	};
 
@@ -160,20 +154,22 @@ static void createRoom(int w, int h, int d) {
 	int bufferIndex = 0;
 	int colorIndex = 0;
 
-	float startPointy = 1.0 - ROW_WIDTH;
+	float startPointy = y2 - ROW_WIDTH;
 	for(int i = 0; i < ROWS; i++, startPointy -= ROW_WIDTH)
 	{
-		float startPointx = -1.0;
+		float startPointx = x1;
 //
 //		// Calculate the positions of the mesh points
 		for(int j = 0; j < COLUMNS + 1; j++, columnIndex++, startPointx += COLUMN_WIDTH)
 		{
 			// Add two points at a time, to create a vertical line
-			meshPos[(columnIndex * 4)] = startPointx;
-			meshPos[(columnIndex * 4) + 1] = startPointy;
+			meshPos[(columnIndex * 6)] = startPointx;
+			meshPos[(columnIndex * 6) + 1] = startPointy;
+			meshPos[(columnIndex * 6) + 2] = z2;
 
-			meshPos[(columnIndex * 4) + 2] = startPointx;
-			meshPos[(columnIndex * 4) + 3] = startPointy + ROW_WIDTH;
+			meshPos[(columnIndex * 6) + 3] = startPointx;
+			meshPos[(columnIndex * 4) + 4] = startPointy + ROW_WIDTH;
+			meshPos[(columnIndex * 6) + 5] = z2;
 		}
 //
 //		// Calculate the values for the indexes
@@ -237,7 +233,7 @@ static void createRoom(int w, int h, int d) {
 	glBindVertexArray(va[1]);
 	glBindBuffer(GL_ARRAY_BUFFER, bufferId[3]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(meshPos), meshPos, GL_STATIC_DRAW);
-	glVertexAttribPointer(vertexMeshPositionLoc, 2, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(vertexMeshPositionLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
 //	glEnableVertexAttribArray(vertexMeshPositionLoc);
 
 	// Bind color buffer
@@ -298,11 +294,16 @@ static void display() {
 	translate(&viewMat, 0, -2, 0);
 
 	glBindVertexArray(va[0]);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 3);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferId[2]);
 
 	glUniformMatrix4fv(viewMatrixLoc, 1, GL_TRUE, viewMat.values);
 	glUniformMatrix4fv(modelMatrixLoc, 1, GL_TRUE, modelMat.values);
-	glDrawElements(GL_TRIANGLE_STRIP, 24, GL_UNSIGNED_SHORT, 0);
+	glDrawElements(GL_TRIANGLE_STRIP, 19, GL_UNSIGNED_SHORT, 0);
+
+	glBindVertexArray(va[1]);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferId[5]);
+	glDrawElements(GL_TRIANGLE_STRIP, (((2 * (COLUMNS + 1)) * ROWS) + ROWS - 1), GL_UNSIGNED_SHORT, 0);
+
 	glutSwapBuffers();
 }
 
@@ -340,6 +341,14 @@ static void exitFunc(unsigned char key, int x, int y) {
 }
 
 int main(int argc, char **argv) {
+	double largo = 200000000000000000000000000000000000000000000000000;
+
+	double largo2 = 8000000000;
+
+	printf("largo 2 %e\n", largo2);
+
+	printf("largo 59 %lf", largo);
+
 	setbuf(stdout, NULL);
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE);
